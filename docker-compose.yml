@@ -1,6 +1,9 @@
 services:
   db:
     image: postgres:16-alpine
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
     environment:
       POSTGRES_USER: scanguard
       POSTGRES_PASSWORD: scanguard_secret
@@ -17,11 +20,17 @@ services:
 
   redis:
     image: redis:7-alpine
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
     ports:
       - "6379:6379"
 
   backend:
     build: ./backend
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
     command: >
       sh -c "alembic upgrade head &&
              uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
@@ -30,11 +39,12 @@ services:
       - upload_data:/app/uploads
     ports:
       - "8000:8000"
+    env_file:
+      - .env
     environment:
       DATABASE_URL: postgresql+asyncpg://scanguard:scanguard_secret@db:5432/scanguard
       SYNC_DATABASE_URL: postgresql://scanguard:scanguard_secret@db:5432/scanguard
       REDIS_URL: redis://redis:6379/0
-      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-your-api-key-here}
       SECRET_KEY: change-me-in-production-super-secret-key-2024
     depends_on:
       db:
@@ -44,6 +54,9 @@ services:
 
   frontend:
     build: ./frontend
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
     ports:
       - "3000:80"
     depends_on:

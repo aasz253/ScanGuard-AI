@@ -2,8 +2,10 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
+RUN echo "nameserver 8.8.8.8\nnameserver 1.1.1.1\nnameserver 208.67.222.222" > /etc/resolv.conf
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    gcc libpq-dev nmap && \
+    gcc libpq-dev && \
     rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
